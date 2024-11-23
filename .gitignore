@@ -39,6 +39,9 @@ jspm_packages/
 # Coverage directory used by tools like istanbul
 coverage/
 
+# IDEs and editors
+.idea/
+
 # Build directories
 dist/
 build/
