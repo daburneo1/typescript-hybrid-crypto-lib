@@ -1,6 +1,8 @@
 import { EncryptionAlgorithm } from './EncryptionAlgorithm';
 import { EncryptionKey } from '../models/EncryptionKey';
 import * as forge from 'node-forge';
+import * as fs from 'fs';
+import * as path from 'path';
 
 export class RsaEncryptionAlgorithm implements EncryptionAlgorithm {
     encrypt(data: Uint8Array, key: EncryptionKey): string {
@@ -14,5 +16,17 @@ export class RsaEncryptionAlgorithm implements EncryptionAlgorithm {
         const decoded = forge.util.decode64(data);
         const decrypted = privateKey.decrypt(decoded, 'RSA-OAEP');
         return new Uint8Array(Buffer.from(decrypted, 'binary'));
+    }
+
+    static loadPublicKeyFromFile(filePath: string): EncryptionKey {
+        const absolutePath = path.resolve(filePath);
+        const publicKeyPem = fs.readFileSync(absolutePath, 'utf16le').trim();
+        return new EncryptionKey(publicKeyPem);
+    }
+
+    static loadPrivateKeyFromFile(filePath: string): EncryptionKey {
+        const absolutePath = path.resolve(filePath);
+        const privateKeyPem = fs.readFileSync(absolutePath, 'utf8').trim();
+        return new EncryptionKey(privateKeyPem);
     }
 }

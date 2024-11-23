@@ -14,32 +14,33 @@ describe('HybridEncryptionService', () => {
         service = new HybridEncryptionService(new AesEncryptionAlgorithm(), new RsaEncryptionAlgorithm());
 
         // Generate RSA keys dynamically
-        const keypair = forge.pki.rsa.generateKeyPair(2048);
-        publicKey = new EncryptionKey(forge.pki.publicKeyToPem(keypair.publicKey));
-        privateKey = new EncryptionKey(forge.pki.privateKeyToPem(keypair.privateKey));
+        privateKey = RsaEncryptionAlgorithm.loadPrivateKeyFromFile('C:\\Users\\davb9\\.ssh\\id_rsa_pkcs8.pem');
+        publicKey = RsaEncryptionAlgorithm.loadPublicKeyFromFile('C:\\Users\\davb9\\.ssh\\id_rsa_pub.pem');
     });
 
     test('encryptData should encrypt data successfully', () => {
-        const data = new Uint8Array([1, 2, 3, 4]);
+        const data = 'test data';
         const encryptedData = service.encryptData(data, publicKey);
 
         expect(encryptedData).toBeInstanceOf(EncryptedData);
         expect(encryptedData.isEncrypted).toBe(true);
+        console.log(data)
+        console.log(encryptedData.data);
         expect(typeof encryptedData.data).toBe('string');
     });
 
     test('decryptData should decrypt encrypted data successfully', () => {
-        const data = new Uint8Array([1, 2, 3, 4]);
+        const data = 'test data';
         const encryptedData = service.encryptData(data, publicKey);
-        const decryptedData = service.decryptData(encryptedData, privateKey);
+        const decryptedData = service.decryptData(encryptedData.data, privateKey);
 
-        expect(decryptedData).toEqual(data);
+        expect(new TextDecoder().decode(decryptedData)).toEqual(data);
     });
 
     test('decryptData should not decrypt if data is not encrypted', () => {
-        const nonEncryptedData = new EncryptedData('plaintext-data', false);
+        const nonEncryptedData = 'plaintext-data';
         const decryptedData = service.decryptData(nonEncryptedData, privateKey);
 
-        expect(decryptedData).toEqual(Uint8Array.from(Buffer.from('plaintext-data', 'utf8')));
+        expect(new TextDecoder().decode(decryptedData)).toEqual(nonEncryptedData);
     });
 });

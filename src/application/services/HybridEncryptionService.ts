@@ -11,18 +11,22 @@ export class HybridEncryptionService implements IEncryptionService {
         private rsaAlgorithm = new RsaEncryptionAlgorithm()
     ) {}
 
-    encryptData(data: Uint8Array, publicKey: EncryptionKey): EncryptedData {
+    encryptData(data: string, publicKey: EncryptionKey): EncryptedData {
+        const dataArray = new TextEncoder().encode(data);
         const aesKey = new EncryptionKey(CryptoJS.lib.WordArray.random(16).toString());
-        const aesEncryptedData = this.aesAlgorithm.encrypt(data, aesKey);
+        const aesEncryptedData = this.aesAlgorithm.encrypt(dataArray, aesKey);
         const rsaEncryptedKey = this.rsaAlgorithm.encrypt(new TextEncoder().encode(aesKey.key), publicKey);
         const hybridEncryptedData = `${rsaEncryptedKey}:${aesEncryptedData}`;
         return new EncryptedData(hybridEncryptedData, true);
     }
 
-    decryptData(data: EncryptedData, privateKey: EncryptionKey): Uint8Array {
-        if (!data.isEncrypted) return Uint8Array.from(Buffer.from(data.data, 'utf8'));
+    decryptData(data: string, privateKey: EncryptionKey): Uint8Array {
+        if (!data.includes(':')) {
+            return Uint8Array.from(Buffer.from(data, 'utf8'));
+        }
 
-        const [rsaEncryptedKey, aesEncryptedData] = data.data.split(':');
+        const encryptedData = new EncryptedData(data, true);
+        const [rsaEncryptedKey, aesEncryptedData] = encryptedData.data.split(':');
         const decryptedAesKey = this.rsaAlgorithm.decrypt(rsaEncryptedKey, privateKey);
         const aesKey = new EncryptionKey(new TextDecoder().decode(decryptedAesKey));
         return this.aesAlgorithm.decrypt(aesEncryptedData, aesKey);
