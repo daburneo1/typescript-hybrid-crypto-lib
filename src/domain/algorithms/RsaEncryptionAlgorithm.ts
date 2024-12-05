@@ -7,26 +7,23 @@ import * as path from 'path';
 export class RsaEncryptionAlgorithm implements EncryptionAlgorithm {
     encrypt(data: Uint8Array, key: EncryptionKey): string {
         const publicKey = forge.pki.publicKeyFromPem(key.key);
-        const encrypted = publicKey.encrypt(Buffer.from(data).toString('binary'), 'RSA-OAEP');
+        const binaryData = new TextDecoder().decode(data);
+        const encrypted = publicKey.encrypt(binaryData, 'RSAES-PKCS1-V1_5');
         return forge.util.encode64(encrypted);
     }
 
     decrypt(data: string, key: EncryptionKey): Uint8Array {
         const privateKey = forge.pki.privateKeyFromPem(key.key);
         const decoded = forge.util.decode64(data);
-        const decrypted = privateKey.decrypt(decoded, 'RSA-OAEP');
+        const decrypted = privateKey.decrypt(decoded, 'RSAES-PKCS1-V1_5');
         return new Uint8Array(Buffer.from(decrypted, 'binary'));
     }
 
-    static loadPublicKeyFromFile(filePath: string): EncryptionKey {
-        const absolutePath = path.resolve(filePath);
-        const publicKeyPem = fs.readFileSync(absolutePath, 'utf16le').trim();
-        return new EncryptionKey(publicKeyPem);
+    static loadPublicKeyFromString(keyString: string): EncryptionKey {
+        return new EncryptionKey(keyString.trim());
     }
 
-    static loadPrivateKeyFromFile(filePath: string): EncryptionKey {
-        const absolutePath = path.resolve(filePath);
-        const privateKeyPem = fs.readFileSync(absolutePath, 'utf8').trim();
-        return new EncryptionKey(privateKeyPem);
+    static loadPrivateKeyFromString(keyString: string): EncryptionKey {
+        return new EncryptionKey(keyString.trim());
     }
 }

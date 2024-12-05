@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "A hybrid encryption library for .NET and TypeScript",
   "main": "dist/index.js",
+  "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",

@@ -14,6 +14,7 @@ export class HybridEncryptionService implements IEncryptionService {
     encryptData(data: string, publicKey: EncryptionKey): EncryptedData {
         const dataArray = new TextEncoder().encode(data);
         const aesKey = new EncryptionKey(CryptoJS.lib.WordArray.random(16).toString());
+        console.log(aesKey);
         const aesEncryptedData = this.aesAlgorithm.encrypt(dataArray, aesKey);
         const rsaEncryptedKey = this.rsaAlgorithm.encrypt(new TextEncoder().encode(aesKey.key), publicKey);
         const hybridEncryptedData = `${rsaEncryptedKey}:${aesEncryptedData}`;
