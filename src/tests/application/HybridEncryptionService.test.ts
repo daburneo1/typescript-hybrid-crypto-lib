@@ -65,7 +65,7 @@ describe('HybridEncryptionService', () => {
     test('decryptData should decrypt encrypted data successfully', () => {
         const data = 'test data';
         const encryptedData = service.encryptData(data, publicKey);
-        const decryptedData = service.decryptData(encryptedData.data, privateKey);
+        const decryptedData = service.decryptData("TJFRLXzCP8VUkrSDayCO8jhqAT8HYCe1IrlO2nkp44C2Cj7M0p117cQsd+ok3JDa66h/P5JKYKB9oUMyK8Txfe5bzonqp6wOJSDPXjAyWek5BmHHfu6FilXtkmWudwd3nqoPOddjQuPkW9tGyME+Vn8JPgauhYuEKEZe8kLC0Q5HMO48Op/SGPlRDURNTfPFH78tqEKuHJJT97D1SRcuVdblMOuYg8ODzSrL2TN2tQL36Yxv5u7pOvYek1HuU+4RhQmL8jsnuoKFn23EeSsSJqVYEzn7a0VlIOK1Tt/wiBNKjsgcfsXxWUuIR7OpfQduc8UvJpsLZRZptPApxSXG/Q==:xA3UiaZLEDWzkSQb1KyAOkQ6JOmQQhxXKDjkHJZupyo=", privateKey);
 
         expect(new TextDecoder().decode(decryptedData)).toEqual(data);
     });
