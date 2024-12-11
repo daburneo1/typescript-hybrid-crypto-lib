@@ -16,7 +16,8 @@ export class RsaEncryptionAlgorithm implements EncryptionAlgorithm {
         const privateKey = forge.pki.privateKeyFromPem(key.key);
         const decoded = forge.util.decode64(data);
         const decrypted = privateKey.decrypt(decoded, 'RSAES-PKCS1-V1_5');
-        return new Uint8Array(Buffer.from(decrypted, 'binary'));
+        const textEncoder = new TextEncoder();
+        return textEncoder.encode(decrypted);
     }
 
     static loadPublicKeyFromString(keyString: string): EncryptionKey {
